@@ -11,11 +11,11 @@
 // 
 // Compute 100 * mean(pred != y) for multinomial linear scores.
 // 
-// X:   n x p design matrix
-// y:   length-n integer labels in {0, 1, ..., K-1}
-// beta:p x K coefficient matrix
+// X - n x p design matrix
+// y - length-n integer labels in {0, 1, ..., K-1}
+// beta - p x K coefficient matrix
 // 
-// Returns misclassification percentage in [0, 100].
+// Returns error score in [0, 100].
 // 
 // [[Rcpp::export]]
 double error_score_rcpp(const arma::mat& X,
