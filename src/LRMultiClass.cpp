@@ -120,7 +120,14 @@ Rcpp::List obj_grad_newton_rcpp(const arma::mat& beta,
     }
     D.col(k) = dk;
   }
-  
+
+  return Rcpp::List::create(
+    Rcpp::Named("objective")      = obj,
+    Rcpp::Named("gradient")       = G,
+    Rcpp::Named("term_after_eta") = D,
+    Rcpp::Named("probs")          = P
+  );
+}  
 
 // For simplicity, no test data, only training data, and no error calculation.
 // X - n x p data matrix
