@@ -32,10 +32,6 @@ double error_score_rcpp(const arma::mat& X,
   for (arma::uword i = 0; i < n; ++i) {
     pred(i) = scores.row(i).index_max(); // in 0..K-1
   }
-  
-  // Compute accuracy
-  arma::uword mismatches = arma::accu(pred != y);
-  return 100.0 * static_cast<double>(mismatches) / static_cast<double>(n);
 }
 
 // For simplicity, no test data, only training data, and no error calculation.
