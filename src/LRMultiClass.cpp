@@ -83,7 +83,7 @@ static inline void compute_term_after_eta(arma::mat& D,
       arma::vec z = arma::solve(arma::trimatl(R.t()), G.col(k));
       dk = arma::solve(arma::trimatu(R), z);
     } else {
-      dk = arma::solve(arma::sympd(Hk), G.col(k));
+      dk = arma::solve(Hk, G.col(k));
     }
     D.col(k) = dk;
   }
