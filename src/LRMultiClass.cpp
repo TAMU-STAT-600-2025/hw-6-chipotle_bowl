@@ -89,7 +89,38 @@ Rcpp::List obj_grad_newton_rcpp(const arma::mat& beta,
   }
   arma::mat G = X.t() * P_for_grad + lambda * beta; // p x K
   
-
+  
+  
+  // 5) term_after_eta: column k = H_k^{-1} * G_k
+  // H_k = X^T diag(w_k) X + lambda I, w_k = p_k (1 - p_k)
+  arma::mat D(p, K, arma::fill::zeros);
+  for (arma::uword k = 0; k < K; ++k) {
+    
+    arma::vec w = P.col(k) % (1.0 - P.col(k)); // n x 1
+    
+    // Xw = (diag(w) * X)
+    arma::mat Xw = X; // n x p
+    Xw.each_col() %= w; // row-wise scale
+    
+    arma::mat Hk = X.t() * Xw; // p x p
+    Hk.diag() += lambda; // ridge on the diagonal
+    
+    // Solve Hk * d = G.col(k) using Cholesky (SPD)
+    arma::mat R;
+    bool ok = arma::chol(R, Hk); // R is upper-triangular, R^T R = Hk
+    arma::vec dk;
+    if (ok) {
+      // Forward: (R^T) z = g
+      arma::vec z = arma::solve(arma::trimatl(R.t()), G.col(k));
+      // Backward: R d = z
+      dk = arma::solve(arma::trimatu(R), z);
+    } else {
+      // Fallback (rare if lambda > 0): symmetric PD solve attempt
+      dk = arma::solve(arma::sympd(Hk), G.col(k));
+    }
+    D.col(k) = dk;
+  }
+  
 
 // For simplicity, no test data, only training data, and no error calculation.
 // X - n x p data matrix
