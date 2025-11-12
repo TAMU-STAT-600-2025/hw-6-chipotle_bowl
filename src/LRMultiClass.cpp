@@ -80,7 +80,15 @@ Rcpp::List obj_grad_newton_rcpp(const arma::mat& beta,
   const double ridge = 0.5 * lambda * arma::accu(beta % beta); // Add regularization
   const double obj = nll + ridge; // Complete objective value
   
-
+  
+  // 4) Gradient X^T (P - Y_onehot) + lambda * beta
+  // Implement P_for_grad = P; P[i, y_i] -= 1
+  arma::mat P_for_grad = P; // n x K
+  for (arma::uword i = 0; i < n; ++i) {
+    P_for_grad(i, y(i)) -= 1.0;
+  }
+  arma::mat G = X.t() * P_for_grad + lambda * beta; // p x K
+  
 
 
 // For simplicity, no test data, only training data, and no error calculation.
