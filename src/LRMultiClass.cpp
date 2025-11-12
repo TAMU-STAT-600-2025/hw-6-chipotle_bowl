@@ -100,4 +100,13 @@ static inline void compute_term_after_eta(arma::mat& D,
 Rcpp::List LRMultiClass_c(const arma::mat& X, const arma::uvec& y, const arma::mat& beta_init,
                           int numIter = 50, double eta = 0.1, double lambda = 1){
 
+  // All input is assumed to be correct
+  
+  // Initialize some parameters
+  int K = max(y) + 1; // number of classes
+  int p = X.n_cols;
+  int n = X.n_rows;
+  arma::mat beta = beta_init; // to store betas and be able to change them if needed
+  arma::vec objective(numIter + 1); // to store objective values
+  
 }
