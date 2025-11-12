@@ -1,17 +1,22 @@
 #' Title
 #'
-#' @param X 
-#' @param y 
-#' @param numIter 
-#' @param eta 
-#' @param lambda 
-#' @param beta_init 
+#' @param X train data
+#' @param y train labels
+#' @param numIter number of iterations
+#' @param eta eta factor
+#' @param lambda regularization factor
+#' @param beta_init initial beta value
 #'
-#' @return
+#' @return return a list with the beta values and the array of objective values
 #' @export
 #'
 #' @examples
 #' # Give example
+#' X <- matrix(rbind(c(1,-1,1), c(1,-1,1.25), c(1,1,2)))
+#' y <- c(0,0,1)
+#' beta <- NULL
+#' out <- LRMultiClass(X, y, beta_init = NULL, numIter = 50, eta = 0.1, lambda = 1)
+
 LRMultiClass <- function(X, y, beta_init = NULL, numIter = 50, eta = 0.1, lambda = 1){
   
   # Compatibility checks from HW3 and initialization of beta_init
@@ -39,24 +44,4 @@ LRMultiClass <- function(X, y, beta_init = NULL, numIter = 50, eta = 0.1, lambda
     stop('lambda must be a non-negative and finite numeric value.')
   }
   
-  classes <- sort(unique(y)) # Sort classes
-  if (any(classes != 0:(length(classes) - 1))) {
-    stop("Classes are not labeled from 0 to K-1.")
-  }
-  K <- length(classes) # Number of classes
-  p <- ncol(X) # Number of features
-  if (is.null(beta_init)) {
-    beta_init <- matrix(0, nrow = p, ncol = K) # Initialize beta with zeros
-  }
-  else {
-    if (!is.matrix(beta_init) || any(dim(beta_init) != c(p, K)))
-      stop("beta_init must be a pxK matrix.")
-    beta_init <- beta_init # Initialize beta with the given beta_init
-  }
-  
-  # Call C++ LRMultiClass_c function to implement the algorithm
-  out = LRMultiClass_c(X, y, beta_init, numIter, eta, lambda)
-  
-  # Return the class assignments
-  return(out)
 }
