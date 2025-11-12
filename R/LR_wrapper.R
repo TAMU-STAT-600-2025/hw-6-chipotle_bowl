@@ -16,6 +16,43 @@ LRMultiClass <- function(X, y, beta_init = NULL, numIter = 50, eta = 0.1, lambda
   
   # Compatibility checks from HW3 and initialization of beta_init
   
+  # Check that the first column of X and Xt are 1s, if not - display appropriate message and stop execution.
+  if (!all(X[, 1] == 1)) {
+    stop('First columns must be all ones.')
+  }
+  
+  # Check for compatibility of dimensions between X and Y
+  n <- nrow(X)
+  if (n != length(y)) {
+    stop('X and y (training data) have different number of samples.')
+  }
+
+  ## Check eta is positive
+  if (!is.numeric(eta) ||
+      length(eta) != 1 || !is.finite(eta) || eta <= 0) {
+    stop('eta must be a positive and finite numeric value.')
+  }
+  
+  ## Check lambda is non-negative
+  if (!is.numeric(lambda) ||
+      length(lambda) != 1 || !is.finite(lambda) || lambda < 0) {
+    stop('lambda must be a non-negative and finite numeric value.')
+  }
+  
+  classes <- sort(unique(y)) # Sort classes
+  if (any(classes != 0:(length(classes) - 1))) {
+    stop("Classes are not labeled from 0 to K-1.")
+  }
+  K <- length(classes) # Number of classes
+  p <- ncol(X) # Number of features
+  if (is.null(beta_init)) {
+    beta_init <- matrix(0, nrow = p, ncol = K) # Initialize beta with zeros
+  }
+  else {
+    if (!is.matrix(beta_init) || any(dim(beta_init) != c(p, K)))
+      stop("beta_init must be a pxK matrix.")
+    beta_init <- beta_init # Initialize beta with the given beta_init
+  }
   
   # Call C++ LRMultiClass_c function to implement the algorithm
   out = LRMultiClass_c(X, y, beta_init, numIter, eta, lambda)
