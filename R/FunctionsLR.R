@@ -79,26 +79,10 @@ LRMultiClass <- function(X,
   ## Check the supplied parameters as described. You can assume that X, Xt are matrices; y, yt are vectors; and numIter, eta, lambda are scalars. You can assume that beta_init is either NULL (default) or a matrix.
   ###################################
   
-  # Check that the first column of X and Xt are 1s, if not - display appropriate message and stop execution.
-  if (!all(X[, 1] == 1) || !all(Xt[, 1] == 1)) {
-    stop('First columns must be all ones.')
-  }
-  
   # Check for compatibility of dimensions between X and Y
   n <- nrow(X)
   if (n != length(y)) {
     stop('X and y (training data) have different number of samples.')
-  }
-  
-  # Check for compatibility of dimensions between Xt and Yt
-  nt <- nrow(Xt)
-  if (nt != length(yt)) {
-    stop('Xt and yt (test data) have different number of samples.')
-  }
-  
-  ## Check for compatibility of dimensions between X and Xt
-  if (ncol(X) != ncol(Xt)) {
-    stop('X and Xt have incompatible dimensions.')
   }
   
   ## Check eta is positive
@@ -133,17 +117,9 @@ LRMultiClass <- function(X,
   ## Calculate corresponding pk, objective value f(beta_init), training error and testing error given the starting point beta_init
   ##########################################################################
   objective   <- numeric(numIter + 1)
-  error_train <- numeric(numIter + 1)
-  error_test  <- numeric(numIter + 1)
-  
+
   og0 <- obj_grad_newton(beta, X, y, lambda = lambda)
   objective[1] <- og0$objective
-  
-  # Initial training error (%)
-  error_train[1] <- error_score(X, y, beta)
-  
-  # Initial testing error (%)
-  error_test[1] <- error_score(Xt, yt, beta)
   
   ##list(objective = obj, gradient = G, term_after_eta = D, probs = P)
   #
@@ -158,14 +134,7 @@ LRMultiClass <- function(X,
     
     # Objective at the updated beta
     objective[t + 1] <- obj_grad_newton(beta, X, y, lambda = lambda)$objective
-    
-    # Training error (%) at the updated beta
-    error_train[t + 1] <- error_score(X, y, beta)
-    
-    # Testing error (%) at the updated beta
-    scores_te <- Xt %*% beta
-    pred_te   <- max.col(scores_te, ties.method = "first") - 1L
-    error_test[t + 1] <- 100 * mean(pred_te != yt)
+
   }
   
   
@@ -181,8 +150,6 @@ LRMultiClass <- function(X,
   return(
     list(
       beta = beta,
-      error_train = error_train,
-      error_test = error_test,
       objective =  objective
     )
   )
