@@ -44,4 +44,19 @@ LRMultiClass <- function(X, y, beta_init = NULL, numIter = 50, eta = 0.1, lambda
     stop('lambda must be a non-negative and finite numeric value.')
   }
   
+  classes <- sort(unique(y)) # Sort classes
+  if (any(classes != 0:(length(classes) - 1))) {
+    stop("Classes are not labeled from 0 to K-1.")
+  }
+  K <- length(classes) # Number of classes
+  p <- ncol(X) # Number of features
+  if (is.null(beta_init)) {
+    beta_init <- matrix(0, nrow = p, ncol = K) # Initialize beta with zeros
+  }
+  else {
+    if (!is.matrix(beta_init) || any(dim(beta_init) != c(p, K)))
+      stop("beta_init must be a pxK matrix.")
+    beta_init <- beta_init # Initialize beta with the given beta_init
+  }
+
 }
