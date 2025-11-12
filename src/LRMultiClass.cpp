@@ -8,126 +8,86 @@
 //
 // [[Rcpp::depends(RcppArmadillo)]]
 
-// 
-// Compute 100 * mean(pred != y) for multinomial linear scores.
-// 
-// X - n x p design matrix
-// y - length-n integer labels in {0, 1, ..., K-1}
-// beta - p x K coefficient matrix
-// 
-// Returns error score in [0, 100].
-// 
-// [[Rcpp::export]]
-double error_score_rcpp(const arma::mat& X,
-                        const arma::uvec& y,
-                        const arma::mat& beta) {
-  // Scores matrix n x K
-  arma::mat scores = X * beta;
+// Objective only: nll + (lambda/2)*||beta||_F^2
+static inline double objective_only(const arma::mat& beta,
+                                    const arma::mat& X,
+                                    const arma::uvec& y,
+                                    const double lambda) {
   
   // Get the number of samples
-  const arma::uword n = scores.n_rows;
-  arma::uvec pred(n);
+  const arma::uword n = X.n_rows;
   
-  // For each individual sample determine the predicted class (biggest score)
-  for (arma::uword i = 0; i < n; ++i) {
-    pred(i) = scores.row(i).index_max(); // in 0..K-1
-  }
+  // Scores and softmax computation
   
-  // Compute accuracy
-  arma::uword mismatches = arma::accu(pred != y);
-  return 100.0 * static_cast<double>(mismatches) / static_cast<double>(n);
+  arma::mat S = X * beta; // n x K
+  arma::vec row_max = arma::max(S, 1); // n
+  S.each_col() -= row_max;
+  arma::mat eS = arma::exp(S); // n x K
+  arma::vec den = arma::sum(eS, 1); // n
+  arma::mat P  = eS;
+  P.each_col() /= den;
+  
+  // Negative log-likelihood
+  double nll = 0.0;
+  for (arma::uword i = 0; i < n; ++i) nll -= std::log(P(i, y(i)));
+  
+  // Ridge panalization
+  const double ridge = 0.5 * lambda * arma::accu(beta % beta);
+  return nll + ridge;
 }
 
-//
-//Multinomial logistic: objective, gradient, and per-class (H^{-1} * grad) term.
-//beta  : p x K coefficient matrix
-//X     : n x p design matrix
-//y     : length-n integer labels in {0, 1, ..., K-1}
-//lambda: L2 regularization strength (ridge)
-//Returns a list:
-// - objective      : scalar (negative log-likelihood + ridge)
-// - gradient       : p x K matrix (X^T (P - Y_onehot) + lambda * beta)
-// - term_after_eta : p x K matrix with columns H_k^{-1} * gradient_k,
-//                    where H_k = X^T diag(p_k (1 - p_k)) X + lambda I_p
-// - probs          : n x K matrix of class probabilities
-//
-// [[Rcpp::export]]
-Rcpp::List obj_grad_newton_rcpp(const arma::mat& beta,
-                                const arma::mat& X,
-                                const arma::uvec& y,
-                                const double lambda = 1.0) {
+// Compute term_after_eta D where each column k solves
+// (X^T diag(w_k) X + lambda I) d_k = g_k,
+// with g = X^T(P - Y_onehot) + lambda*beta.
+static inline void compute_term_after_eta(arma::mat& D,
+                                          const arma::mat& beta,
+                                          const arma::mat& X,
+                                          const arma::mat& Xt,
+                                          const arma::uvec& y,
+                                          const double lambda) {
   
-  // 1) Get the dimentions for all the matrices
+  // Get dimentions
   const arma::uword n = X.n_rows;
   const arma::uword p = X.n_cols;
   const arma::uword K = beta.n_cols;
-
-  // 2) Softmax probabilities P
-  arma::vec row_max = arma::max(S, 1); // n x 1
-  S.each_col() -= row_max; // stabilize
-  arma::mat eS = arma::exp(S); // element-wise exp
-  arma::vec den = arma::sum(eS, 1); // n x 1 (row sums)
-  arma::mat P  = eS; // n x K
-  P.each_col() /= den; // divide each row by its sum
-
-  // 3) Objective function NLL + (lambda/2) * ||beta||_F^2
-  double nll = 0.0; // Initial value of NLL
-  for (arma::uword i = 0; i < n; ++i) {
-    const arma::uword yi = y(i); // 0..K-1
-    // Update NLL
-    nll -= std::log(P(i, yi));
-  }
-  const double ridge = 0.5 * lambda * arma::accu(beta % beta); // Add regularization
-  const double obj = nll + ridge; // Complete objective value
   
+  // Scores and softmax
+  arma::mat S = X * beta; // n x K
+  arma::vec row_max = arma::max(S, 1);
+  S.each_col() -= row_max;
+  arma::mat eS = arma::exp(S);
+  arma::vec den = arma::sum(eS, 1);
+  arma::mat P  = eS;
+  P.each_col() /= den; // n x K
   
-  // 4) Gradient X^T (P - Y_onehot) + lambda * beta
-  // Implement P_for_grad = P; P[i, y_i] -= 1
-  arma::mat P_for_grad = P; // n x K
-  for (arma::uword i = 0; i < n; ++i) {
-    P_for_grad(i, y(i)) -= 1.0;
-  }
-  arma::mat G = X.t() * P_for_grad + lambda * beta; // p x K
+  // Gradient: X^T(P - Y_onehot) + lambda*beta
+  arma::mat P_for_grad = P;
+  for (arma::uword i = 0; i < n; ++i) P_for_grad(i, y(i)) -= 1.0;
+  arma::mat G = Xt * P_for_grad + lambda * beta;   // p x K
   
-  
-  
-  // 5) term_after_eta: column k = H_k^{-1} * G_k
-  // H_k = X^T diag(w_k) X + lambda I, w_k = p_k (1 - p_k)
-  arma::mat D(p, K, arma::fill::zeros);
+  // Hessian block solve via Cholesky
   for (arma::uword k = 0; k < K; ++k) {
+    arma::vec w = P.col(k) % (1.0 - P.col(k)); // n
     
-    arma::vec w = P.col(k) % (1.0 - P.col(k)); // n x 1
-    
-    // Xw = (diag(w) * X)
+    // Xw = diag(w)*X by row scaling
     arma::mat Xw = X; // n x p
-    Xw.each_col() %= w; // row-wise scale
+    Xw.each_col() %= w;
     
-    arma::mat Hk = X.t() * Xw; // p x p
-    Hk.diag() += lambda; // ridge on the diagonal
+    arma::mat Hk = Xt * Xw; // p x p
+    Hk.diag() += lambda; // + lambda I
     
-    // Solve Hk * d = G.col(k) using Cholesky (SPD)
     arma::mat R;
-    bool ok = arma::chol(R, Hk); // R is upper-triangular, R^T R = Hk
     arma::vec dk;
-    if (ok) {
-      // Forward: (R^T) z = g
+    if (arma::chol(R, Hk)) {
+      // Solve (R^T) z = g, then R d = z
       arma::vec z = arma::solve(arma::trimatl(R.t()), G.col(k));
-      // Backward: R d = z
       dk = arma::solve(arma::trimatu(R), z);
     } else {
-      // Fallback (rare if lambda > 0): symmetric PD solve attempt
       dk = arma::solve(arma::sympd(Hk), G.col(k));
     }
     D.col(k) = dk;
   }
-
-  return Rcpp::List::create(
-    Rcpp::Named("objective")      = obj,
-    Rcpp::Named("gradient")       = G,
-    Rcpp::Named("term_after_eta") = D,
-    Rcpp::Named("probs")          = P
-  );
-}  
+}
 
 // For simplicity, no test data, only training data, and no error calculation.
 // X - n x p data matrix
@@ -138,22 +98,6 @@ Rcpp::List obj_grad_newton_rcpp(const arma::mat& beta,
 // beta_init - p x K matrix of starting beta values (always supplied in right format)
 // [[Rcpp::export]]
 Rcpp::List LRMultiClass_c(const arma::mat& X, const arma::uvec& y, const arma::mat& beta_init,
-                               int numIter = 50, double eta = 0.1, double lambda = 1){
-    // All input is assumed to be correct
-    
-    // Initialize some parameters
-    int K = max(y) + 1; // number of classes
-    int p = X.n_cols;
-    int n = X.n_rows;
-    arma::mat beta = beta_init; // to store betas and be able to change them if needed
-    arma::vec objective(numIter + 1); // to store objective values
-    
-    // Initialize anything else that you may need
-    
-    // Newton's method cycle - implement the update EXACTLY numIter iterations
-    
-    
-    // Create named list with betas and objective values
-    return Rcpp::List::create(Rcpp::Named("beta") = beta,
-                              Rcpp::Named("objective") = objective);
+                          int numIter = 50, double eta = 0.1, double lambda = 1){
+
 }
