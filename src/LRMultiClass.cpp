@@ -111,6 +111,27 @@ Rcpp::List LRMultiClass_c(const arma::mat& X, const arma::uvec& y, const arma::m
   
   // Initialize anything else that you may need
   
+  // Precompute X^T once
+  arma::mat Xt = X.t();
   
+  // Initial objective at beta_init
+  objective(0) = objective_only(beta, X, y, lambda);
+  
+  // Newton's method cycle - implement the update EXACTLY numIter iterations
+  arma::mat D(p, K, arma::fill::zeros);
+  for (int t = 0; t < numIter; ++t) {
+    // Compute D = (H^{-1} * grad) block-wise at current beta
+    compute_term_after_eta(D, beta, X, Xt, y, lambda);
+    
+    // Gradient step with damping eta
+    beta -= eta * D;
+    
+    // Objective at the updated beta
+    objective(t + 1) = objective_only(beta, X, y, lambda);
+  }
+  
+  // Create named list with betas and objective values
+  return Rcpp::List::create(Rcpp::Named("beta") = beta,
+                            Rcpp::Named("objective") = objective);
   
 }
