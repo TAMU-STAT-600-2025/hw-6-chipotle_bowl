@@ -70,6 +70,16 @@ Rcpp::List obj_grad_newton_rcpp(const arma::mat& beta,
   arma::mat P  = eS; // n x K
   P.each_col() /= den; // divide each row by its sum
 
+  // 3) Objective function NLL + (lambda/2) * ||beta||_F^2
+  double nll = 0.0; // Initial value of NLL
+  for (arma::uword i = 0; i < n; ++i) {
+    const arma::uword yi = y(i); // 0..K-1
+    // Update NLL
+    nll -= std::log(P(i, yi));
+  }
+  const double ridge = 0.5 * lambda * arma::accu(beta % beta); // Add regularization
+  const double obj = nll + ridge; // Complete objective value
+  
 
 
 
