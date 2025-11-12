@@ -8,6 +8,36 @@
 //
 // [[Rcpp::depends(RcppArmadillo)]]
 
+// 
+// Compute 100 * mean(pred != y) for multinomial linear scores.
+// 
+// X:   n x p design matrix
+// y:   length-n integer labels in {0, 1, ..., K-1}
+// beta:p x K coefficient matrix
+// 
+// Returns misclassification percentage in [0, 100].
+// 
+// [[Rcpp::export]]
+double error_score_rcpp(const arma::mat& X,
+                        const arma::uvec& y,
+                        const arma::mat& beta) {
+  // Scores matrix n x K
+  arma::mat scores = X * beta;
+  
+  // Get the number of samples
+  const arma::uword n = scores.n_rows;
+  arma::uvec pred(n);
+  
+  // For each individual sample determine the predicted class (biggest score)
+  for (arma::uword i = 0; i < n; ++i) {
+    pred(i) = scores.row(i).index_max(); // in 0..K-1
+  }
+  
+  // Compute accuracy
+  arma::uword mismatches = arma::accu(pred != y);
+  return 100.0 * static_cast<double>(mismatches) / static_cast<double>(n);
+}
+
 // For simplicity, no test data, only training data, and no error calculation.
 // X - n x p data matrix
 // y - n length vector of classes, from 0 to K-1
