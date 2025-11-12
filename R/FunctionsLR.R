@@ -140,7 +140,6 @@ LRMultiClass <- function(X,
   
   # Within one iteration: perform the update, calculate updated objective function and training/testing errors in %
   
-  
   ## Return output
   ##########################################################################
   # beta - p x K matrix of estimated beta values after numIter iterations
