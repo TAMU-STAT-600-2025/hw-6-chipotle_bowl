@@ -109,4 +109,8 @@ Rcpp::List LRMultiClass_c(const arma::mat& X, const arma::uvec& y, const arma::m
   arma::mat beta = beta_init; // to store betas and be able to change them if needed
   arma::vec objective(numIter + 1); // to store objective values
   
+  // Initialize anything else that you may need
+  
+  
+  
 }
