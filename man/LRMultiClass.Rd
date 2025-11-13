@@ -7,21 +7,28 @@
 LRMultiClass(X, y, beta_init = NULL, numIter = 50, eta = 0.1, lambda = 1)
 }
 \arguments{
-\item{X}{}
+\item{X}{train data}
 
-\item{y}{}
+\item{y}{train labels}
 
-\item{beta_init}{}
+\item{beta_init}{initial beta value}
 
-\item{numIter}{}
+\item{numIter}{number of iterations}
 
-\item{eta}{}
+\item{eta}{eta factor}
 
-\item{lambda}{}
+\item{lambda}{regularization factor}
+}
+\value{
+return a list with the beta values and the array of objective values
 }
 \description{
 Title
 }
 \examples{
 # Give example
+X <- matrix(rbind(c(1,-1,1), c(1,-1,1.25), c(1,1,2)), 3, 3)
+y <- c(0,0,1)
+beta <- NULL
+out <- LRMultiClass(X, y, beta_init = NULL, numIter = 50, eta = 0.1, lambda = 1)
 }

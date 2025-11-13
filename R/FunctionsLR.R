@@ -68,7 +68,7 @@ obj_grad_newton <- function(beta, X, y, lambda = 1) {
 # objective - (numIter + 1) length vector of objective values of the function that we are minimizing at each iteration (+ starting value)
 
 
-LRMultiClass <- function(X,
+LRMultiClass_R <- function(X,
                          y,
                          Xt,
                          yt,
