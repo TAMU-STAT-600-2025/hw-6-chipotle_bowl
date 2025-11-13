@@ -3,9 +3,5 @@
 export(LRMultiClass)
 export(MyKmeans)
 export(fitLASSO_prox_Nesterov)
-export(LRMultiClass_R)
-import(readr)
-import(usethis)
 importFrom(Rcpp,evalCpp)
 useDynLib(GroupHW, .registration = TRUE)
-

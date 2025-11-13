@@ -114,10 +114,11 @@ LRMultiClass_R <- function(X,
   
   ## Calculate corresponding pk, objective value f(beta_init), training error and testing error given the starting point beta_init
   ##########################################################################
-  objective   <- numeric(numIter + 1)
+  objective_array_final   <- rep(1, times = numIter + 1)
 
   og0 <- obj_grad_newton(beta, X, y, lambda = lambda)
-  objective[1] <- og0$objective
+  
+  objective_array_final[1] <- og0$objective
   
   ##list(objective = obj, gradient = G, term_after_eta = D, probs = P)
   #
@@ -131,13 +132,12 @@ LRMultiClass_R <- function(X,
     beta <- beta - eta * og$term_after_eta
     
     # Objective at the updated beta
-    objective[t + 1] <- obj_grad_newton(beta, X, y, lambda = lambda)$objective
-
+    objective_array_final[t + 1] <- obj_grad_newton(beta, X, y, lambda = lambda)$objective
+    
   }
   
-  
   # Within one iteration: perform the update, calculate updated objective function and training/testing errors in %
-  
+
   ## Return output
   ##########################################################################
   # beta - p x K matrix of estimated beta values after numIter iterations
@@ -147,7 +147,7 @@ LRMultiClass_R <- function(X,
   return(
     list(
       beta = beta,
-      objective =  objective
+      objective =  objective_array_final
     )
   )
 }

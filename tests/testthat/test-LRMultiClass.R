@@ -12,12 +12,7 @@ test_that("multiplication works", {
   y <- mydata[, 4]
   
   # 4. Apply the previos R based LR MultiClass to the actual data
-  output_R_previous <- LRMultiClass_R(X,
-                 y,
-                 numIter = 50,
-                 eta = 0.1,
-                 lambda = 1,
-                 beta_init = NULL)
+  output_R_previous <- LRMultiClass_R(X, y, numIter = 50, eta = 0.1, lambda = 1, beta_init = NULL)
   
   # 5. Apply the new Rcpp based LR MultiClass to the actual data
   output_R <- LRMultiClass(X,
@@ -26,8 +21,10 @@ test_that("multiplication works", {
                numIter = 50,
                eta = 0.1,
                lambda = 1)
-  
+  # 6. Test: the beta's dimentionality, the beta's values and the las five objective values
   expect_equal(dim(output_R_previous$beta), dim(output_R$beta))
   expect_equal(output_R_previous$beta, output_R$beta)
+  expect_equal(as.vector(output_R_previous$objective)[46:51],
+               as.vector(output_R$objective)[46:51])
 
 })
