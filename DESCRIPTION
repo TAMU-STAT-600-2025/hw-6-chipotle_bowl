@@ -20,7 +20,8 @@ Description: This project is based on the implementation of the K-Means and the 
 License: GPL (>= 3)
 Imports: 
     Rcpp,
-    readr
+    readr,
+    usethis
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.3.3
 Encoding: UTF-8
