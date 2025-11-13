@@ -19,7 +19,8 @@ Maintainer: Leonardo D. Cázares-Trejo <leonardocazares@tamu.edu>
 Description: This project is based on the implementation of the K-Means and the Multi-class logistic regression algorithms in Rcpp from the original R HWs (2 and 3).
 License: GPL (>= 3)
 Imports: 
-    Rcpp
+    Rcpp,
+    readr
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.3.3
 Encoding: UTF-8
