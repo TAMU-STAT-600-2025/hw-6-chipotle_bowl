@@ -8,3 +8,4 @@ import(readr)
 import(usethis)
 importFrom(Rcpp,evalCpp)
 useDynLib(GroupHW, .registration = TRUE)
+
