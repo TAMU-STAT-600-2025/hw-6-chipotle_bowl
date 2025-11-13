@@ -1,11 +1,12 @@
-#' Title
+#' K-means Clustering Algorithm
 #'
-#' @param X 
-#' @param K 
-#' @param M 
-#' @param numIter 
+#' @param X A numeric matrix of size n x p
+#' @param K An integer specifying the number of clusters
+#' @param M A K x p matrix of initial cluster centers. If NULL (default), 
+#'   K random observations from X will be used as initial centers
+#' @param numIter Maximum number of iterations (default is 100)
 #'
-#' @return Explain return
+#' @return A vector of length n containing cluster assignments
 #' @export
 #'
 #' @examples
