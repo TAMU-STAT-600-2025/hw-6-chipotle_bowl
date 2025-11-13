@@ -19,7 +19,7 @@ test_that("multiplication works", {
                  lambda = 1,
                  beta_init = NULL)
   
-  # 4. Apply the new Rcpp based LR MultiClass to the actual data
+  # 5. Apply the new Rcpp based LR MultiClass to the actual data
   output_R <- LRMultiClass(X,
                y,
                beta_init = NULL,
