@@ -24,3 +24,6 @@ Imports:
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.3.3
 Encoding: UTF-8
+Depends: 
+    R (>= 3.5)
+LazyData: true
