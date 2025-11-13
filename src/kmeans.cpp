@@ -19,11 +19,48 @@ arma::uvec MyKmeans_c(const arma::mat& X, int K,
     arma::uvec Y(n); // to store cluster assignments
     
     // Initialize any additional parameters if needed
+    arma::vec X_sq = arma::sum(arma::square(X), 1);
+    arma::mat M_current = M;
+    arma::uvec cluster_index;
     
     // For loop with kmeans algorithm
-    
+    for (int iter = 1; iter <= numIter; iter++) {
+      // ||X_i - mu_k||^2 = (X_i - mu_k)^T(X_i - mu_k) = ||X_i||^2 + ||mu_k||^2 - 2 * X_i^T * mu_k
+      arma::vec M_sq = arma::sum(arma::square(M_current), 1);
+      arma::mat XM = X * M_current.t();
+      arma::mat sq_euc_dist = arma::repmat(X_sq, 1, M_sq.size()) + 
+        arma::repmat(M_sq.t(), X_sq.size(), 1) - 2 * XM;
+      
+      cluster_index = arma::index_min(sq_euc_dist, 1);
+      
+      // Check if a cluster has disappeared
+      arma::uvec unique_clusters = arma::unique(cluster_index);
+      
+      if (unique_clusters.n_elem != K) {
+        Rcpp::stop("One of the clusters has disappeared");
+      }
+      
+      // Assign new M
+      arma::mat M_new = M_current;
+      
+      for (int k = 0; k < K; k++) {
+        M_new.row(k) = arma::mean(X.rows(arma::find(cluster_index == k)), 0);
+      }
+      
+      if (arma::approx_equal(M_current, M_new, "absdiff", 1e-10)) {
+        Rcpp::Rcout << "Centroids have converged" << std::endl;
+        break;
+      }
+      
+      M_current = M_new;
+      
+      if (iter == numIter) {
+        Rcpp::Rcout << "Maximum number of iterations reached" << std::endl;
+      }
+    }
     
     // Returns the vector of cluster assignments
+    Y = cluster_index + 1;
     return(Y);
 }
 
