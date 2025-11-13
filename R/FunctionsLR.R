@@ -70,8 +70,6 @@ obj_grad_newton <- function(beta, X, y, lambda = 1) {
 
 LRMultiClass_R <- function(X,
                          y,
-                         Xt,
-                         yt,
                          numIter = 50,
                          eta = 0.1,
                          lambda = 1,
