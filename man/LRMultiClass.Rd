@@ -31,4 +31,6 @@ X <- matrix(rbind(c(1,-1,1), c(1,-1,1.25), c(1,1,2)), 3, 3)
 y <- c(0,0,1)
 beta <- NULL
 out <- LRMultiClass(X, y, beta_init = NULL, numIter = 50, eta = 0.1, lambda = 1)
+print(dim(out$beta))
+print(out$beta)
 }

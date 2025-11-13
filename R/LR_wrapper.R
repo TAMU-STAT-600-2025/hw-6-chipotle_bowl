@@ -16,6 +16,8 @@
 #' y <- c(0,0,1)
 #' beta <- NULL
 #' out <- LRMultiClass(X, y, beta_init = NULL, numIter = 50, eta = 0.1, lambda = 1)
+#' print(dim(out$beta))
+#' print(out$beta)
 
 LRMultiClass <- function(X, y, beta_init = NULL, numIter = 50, eta = 0.1, lambda = 1){
   
