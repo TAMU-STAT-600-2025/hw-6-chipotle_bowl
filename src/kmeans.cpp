@@ -25,8 +25,8 @@ arma::uvec MyKmeans_c(const arma::mat& X, int K,
     
     // Initialize any additional parameters if needed
     arma::vec X_sq = arma::sum(arma::square(X), 1);
-    arma::mat M_current = M;
-    arma::uvec cluster_index;
+    arma::mat M_current = M; // Current centers
+    arma::uvec cluster_index; // Vector for the index of all the centers 
     
     // For loop with kmeans algorithm
     for (int iter = 1; iter <= numIter; iter++) {
