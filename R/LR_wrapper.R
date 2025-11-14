@@ -1,4 +1,4 @@
-#' Title
+#' Logistic Regression
 #'
 #' @param X train data
 #' @param y train labels
