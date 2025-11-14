@@ -66,6 +66,7 @@ arma::uvec MyKmeans_c(const arma::mat& X, int K,
       // Update the new centers.
       M_current = M_new;
       
+      // Stop if the max number of iterations has been reached
       if (iter == numIter) {
         Rcpp::Rcout << "Maximum number of iterations reached" << std::endl;
       }
