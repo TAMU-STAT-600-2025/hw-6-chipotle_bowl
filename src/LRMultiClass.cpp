@@ -20,6 +20,7 @@ static inline double objective_only(const arma::mat& beta,
   // Scores and softmax computation
   
   arma::mat S = X * beta; // n x K
+  // Numerical stability: subtract row max before exp() to prevent overflow
   arma::vec row_max = arma::max(S, 1); // n
   S.each_col() -= row_max;
   arma::mat eS = arma::exp(S); // n x K
@@ -66,7 +67,9 @@ static inline void compute_term_after_eta(arma::mat& D,
   arma::mat G = Xt * P_for_grad + lambda * beta;   // p x K
   
   // Hessian block solve via Cholesky
+  // Hessian is block diagonal - solve each class separately for efficiency
   for (arma::uword k = 0; k < K; ++k) {
+    // w_k = P_k * (1 - P_k) from second derivative of log-likelihood
     arma::vec w = P.col(k) % (1.0 - P.col(k)); // n
     
     // Xw = diag(w)*X by row scaling
