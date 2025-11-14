@@ -2,7 +2,7 @@
 % Please edit documentation in R/LR_wrapper.R
 \name{LRMultiClass}
 \alias{LRMultiClass}
-\title{Title}
+\title{Logistic Regression}
 \usage{
 LRMultiClass(X, y, beta_init = NULL, numIter = 50, eta = 0.1, lambda = 1)
 }
@@ -23,7 +23,7 @@ LRMultiClass(X, y, beta_init = NULL, numIter = 50, eta = 0.1, lambda = 1)
 return a list with the beta values and the array of objective values
 }
 \description{
-Title
+Logistic Regression
 }
 \examples{
 # Give example
