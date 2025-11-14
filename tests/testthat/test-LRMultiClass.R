@@ -1,13 +1,13 @@
 test_that("multiplication works", {
   
   # Load data
-  mydata <- cbind(Intercept = 1, mydata)
+  mydatat <- cbind(Intercept = 1, mydata)
 
   # 2. Extract X = first three columns (as matrix)
-  X <- as.matrix(mydata[, 1:3])
+  X <- as.matrix(mydatat[, 1:3])
   
   # 3. Extract y = fourth column (as vector)
-  y <- mydata[, 4]
+  y <- mydatat[, 4]
   
   # 4. Apply the previos R based LR MultiClass to the actual data
   output_R_previous <- LRMultiClass_R(X, y, numIter = 50, eta = 0.1, lambda = 1, beta_init = NULL)
