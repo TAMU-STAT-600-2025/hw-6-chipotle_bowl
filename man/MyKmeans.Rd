@@ -2,49 +2,25 @@
 % Please edit documentation in R/Kmeans_wrapper.R
 \name{MyKmeans}
 \alias{MyKmeans}
-\title{K-means Clustering Algorithm}
+\title{Title}
 \usage{
 MyKmeans(X, K, M = NULL, numIter = 100)
 }
 \arguments{
-\item{X}{A numeric matrix of size n x p}
+\item{X}{}
 
-\item{K}{An integer specifying the number of clusters}
+\item{K}{}
 
-\item{M}{A K x p matrix of initial cluster centers. If NULL (default), 
-K random observations from X will be used as initial centers}
+\item{M}{}
 
-\item{numIter}{Maximum number of iterations (default is 100)}
+\item{numIter}{}
 }
 \value{
-A vector of length n containing cluster assignments
+Explain return
 }
 \description{
-K-means Clustering Algorithm
+Title
 }
 \examples{
-# Generate simple 2D data with 3 clusters
-set.seed(123)
-n <- 150
-p <- 2
-K <- 3
-
-# Create three clusters
-cluster1 <- matrix(rnorm(50*p, mean = 0), ncol = p)
-cluster2 <- matrix(rnorm(50*p, mean = 5), ncol = p)
-cluster3 <- matrix(rnorm(50*p, mean = c(2.5, 5)), ncol = p)
-X <- rbind(cluster1, cluster2, cluster3)
-
-# Run K-means clustering
-result <- MyKmeans(X, K = 3)
-
-# Check cluster assignments
-table(result)
-
-# Example with custom initial centers
-initial_centers <- X[c(1, 51, 101), ]
-result2 <- MyKmeans(X, K = 3, M = initial_centers)
-
-# Check cluster assignments
-table(result2)
+# Give example
 }
