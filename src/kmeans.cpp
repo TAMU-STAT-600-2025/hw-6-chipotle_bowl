@@ -44,6 +44,7 @@ arma::uvec MyKmeans_c(const arma::mat& X, int K,
       // Check if a cluster has disappeared
       arma::uvec unique_clusters = arma::unique(cluster_index);
       
+      // As a sanity check stop if any of the clusters disappeared
       if (unique_clusters.n_elem != K) {
         Rcpp::stop("One of the clusters has disappeared");
       }
