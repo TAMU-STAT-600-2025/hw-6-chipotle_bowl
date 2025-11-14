@@ -57,6 +57,7 @@ arma::uvec MyKmeans_c(const arma::mat& X, int K,
         M_new.row(k) = arma::mean(X.rows(arma::find(cluster_index == k)), 0);
       }
       
+      // Check of the mean of the clusters did not change between iterations
       if (arma::approx_equal(M_current, M_new, "absdiff", 1e-10)) {
         Rcpp::Rcout << "Centroids have converged" << std::endl;
         break;
