@@ -9,14 +9,14 @@
 // [[Rcpp::depends(RcppArmadillo)]]
 
 // [[Rcpp::export]]
-// Inputs:
-// X n x p matrix for input data
-// K fixed number of clusters
-// M initial centers for all the clusters of data
-// numIter max number of iterations allowed for the algorithm
 arma::uvec MyKmeans_c(const arma::mat& X, int K,
                             const arma::mat& M, int numIter = 100){
     // All input is assumed to be correct
+    // Inputs:
+    // X n x p matrix for input data
+    // K fixed number of clusters
+    // M initial centers for all the clusters of data
+    // numIter max number of iterations allowed for the algorithm
     
     // Initialize some parameters
     int n = X.n_rows;
