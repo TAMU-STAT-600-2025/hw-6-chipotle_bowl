@@ -33,9 +33,12 @@ arma::uvec MyKmeans_c(const arma::mat& X, int K,
       // ||X_i - mu_k||^2 = (X_i - mu_k)^T(X_i - mu_k) = ||X_i||^2 + ||mu_k||^2 - 2 * X_i^T * mu_k
       arma::vec M_sq = arma::sum(arma::square(M_current), 1);
       arma::mat XM = X * M_current.t();
+      
+      // Pair-wise distance between the points and the cluster centers || \mu_i - x_i ||
       arma::mat sq_euc_dist = arma::repmat(X_sq, 1, M_sq.size()) + 
         arma::repmat(M_sq.t(), X_sq.size(), 1) - 2 * XM;
       
+      // Re-assign the correspondent new cluster for each point
       cluster_index = arma::index_min(sq_euc_dist, 1);
       
       // Check if a cluster has disappeared
