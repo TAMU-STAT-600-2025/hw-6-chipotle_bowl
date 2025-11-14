@@ -1,8 +1,6 @@
 test_that("multiplication works", {
   
   # Load data
-  path <- '/Users/leonardocazares/Desktop/Fall 2025/Reproducible_Computations/HWs/hw-6-chipotle_bowl/data/mydata.rda'
-  load(path)
   mydata <- cbind(Intercept = 1, mydata)
 
   # 2. Extract X = first three columns (as matrix)
