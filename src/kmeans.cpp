@@ -63,6 +63,7 @@ arma::uvec MyKmeans_c(const arma::mat& X, int K,
         break;
       }
       
+      // Update the new centers.
       M_current = M_new;
       
       if (iter == numIter) {
