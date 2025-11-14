@@ -52,6 +52,7 @@ arma::uvec MyKmeans_c(const arma::mat& X, int K,
       // Assign new M
       arma::mat M_new = M_current;
       
+      // Re-compute the centers of the clusters
       for (int k = 0; k < K; k++) {
         M_new.row(k) = arma::mean(X.rows(arma::find(cluster_index == k)), 0);
       }
